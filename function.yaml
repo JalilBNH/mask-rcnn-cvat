@@ -1,0 +1,52 @@
+metadata:
+  name: pth-facebookresearch-detectron2-mask-rcnn
+  namespace: cvat
+  annotations:
+    name: Mask RCNN
+    type: segmentor
+    spec: |
+      [
+        { "id": 1, "name": "bloc", "type": "polygon" }
+      ]
+
+spec:
+  description: Mask RCNN from Detectron2
+  runtime: 'python:3.11'
+  handler: main:handler
+  eventTimeout: 30s
+
+  build:
+    image: cvat.pth.facebookresearch.detectron2.mask_rcnn
+    baseImage: ubuntu:20.04
+
+    directives:
+      preCopy:
+        - kind: ENV
+          value: DEBIAN_FRONTEND=noninteractive
+        - kind: RUN
+          value: apt-get update && apt-get -y install curl git python3 python3-pip
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip3 install torch==1.8.1+cpu torchvision==0.9.1+cpu torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+        - kind: RUN
+          value: pip3 install 'git+https://github.com/facebookresearch/detectron2@ff53992b1985'
+        - kind: RUN
+          value: curl -L -o model_final.pth https://github.com/JalilBNH/Vrak3D/raw/main/model/model_final.pth 
+        - kind: RUN
+          value: ln -s /usr/bin/pip3 /usr/local/bin/pip && ln -s /usr/bin/python3 /usr/bin/python
+
+  triggers:
+    myHttpTrigger:
+      maxWorkers: 2
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 33554432 # 32MB
+
+  platform:
+    attributes:
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3
+      mountMode: volume
