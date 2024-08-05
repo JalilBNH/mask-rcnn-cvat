@@ -1,22 +1,22 @@
 metadata:
-  name: pth-facebookresearch-detectron2-mask-rcnn
+  name: pth-facebookresearch-detectron2-retinanet-r101
   namespace: cvat
   annotations:
-    name: Mask RCNN
-    type: segmentor
+    name: RetinaNet R101
+    type: detector
     spec: |
       [
-        { "id": 1, "name": "bloc", "type": "polygon" }
+        { "id": 1, "name": "bloc", "type": "polygon" },
       ]
 
 spec:
-  description: Mask RCNN from Detectron2
-  runtime: 'python:3.11'
+  description: RetinaNet R101 from Detectron2
+  runtime: 'python:3.8'
   handler: main:handler
   eventTimeout: 30s
 
   build:
-    image: cvat.pth.facebookresearch.detectron2.mask_rcnn
+    image: cvat.pth.facebookresearch.detectron2.retinanet_r101
     baseImage: ubuntu:20.04
 
     directives:
@@ -32,7 +32,7 @@ spec:
         - kind: RUN
           value: pip3 install 'git+https://github.com/facebookresearch/detectron2@ff53992b1985'
         - kind: RUN
-          value: curl -L -o model_final.pth https://github.com/JalilBNH/Vrak3D/raw/main/model/model_final.pth 
+          value: curl -L -o model_final.pth https://github.com/JalilBNH/Vrak3D/raw/main/model/model_final.pth
         - kind: RUN
           value: ln -s /usr/bin/pip3 /usr/local/bin/pip && ln -s /usr/bin/python3 /usr/bin/python
 
